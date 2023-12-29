@@ -4,7 +4,10 @@ import struct
 import logging
 
 async def read_characteristic_value(address, characteristic_uuid):
-    async with BleakClient(address, timeout=120) as client:
+    client = BleakClient(address, timeout=120)
+    try:
+        await client.connect()
+        # logging.info(f"Connected: {client.is_connected}")
         # 遍歷每個服務並獲取其特徵
         # for service in client.services:
         #     print(f"Service: {service.uuid}")
@@ -20,7 +23,9 @@ async def read_characteristic_value(address, characteristic_uuid):
         batteryLevel = round((voltage - 2.1),2) * 100
         temperature = struct.unpack('H', value[:2])[0] / 100
 
-        print(f"溫溼度,設備={''.join(map(chr, model_number))} Tempterature={temperature},Humidity={humidity}i,batteryLevel={batteryLevel}")
+        print(f"hygrometer,device={''.join(map(chr, model_number))} Tempterature={temperature},Humidity={humidity}i,batteryLevel={batteryLevel}")
+    except Exception as e:
+        print(e)
 
 log_level = logging.INFO
 logging.basicConfig(
